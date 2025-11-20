@@ -1,0 +1,40 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode insertionSortList(ListNode head) {
+        if (head == null || head.next == null) return head;
+
+        // Dummy head to simplify insertion at head
+        ListNode dummy = new ListNode(0);
+        ListNode curr = head;
+
+        while (curr != null) {
+            // Keep next node before we rewire curr
+            ListNode next = curr.next;
+
+            // Find insertion point in the sorted list (start from dummy)
+            ListNode prev = dummy;
+            // Use <= to ensure stability: insert after existing equal values
+            while (prev.next != null && prev.next.val <= curr.val) {
+                prev = prev.next;
+            }
+
+            // Insert curr between prev and prev.next
+            curr.next = prev.next;
+            prev.next = curr;
+
+            // Move to the next input node
+            curr = next;
+        }
+
+        return dummy.next;
+    }
+}
