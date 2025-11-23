@@ -1,0 +1,57 @@
+import java.util.*;
+
+class Solution {
+    public int maxPoints(int[][] points) {
+        int n = points.length;
+        if (n <= 2) return n;
+        int ans = 1;
+        
+        for (int i = 0; i < n; i++) {
+            Map<Long, Integer> count = new HashMap<>();
+            int same = 0; // duplicate points (not needed by problem since unique, kept for completeness)
+            int localMax = 0;
+            int x1 = points[i][0], y1 = points[i][1];
+            
+            for (int j = i + 1; j < n; j++) {
+                int x2 = points[j][0], y2 = points[j][1];
+                int dx = x2 - x1;
+                int dy = y2 - y1;
+                
+                if (dx == 0 && dy == 0) {
+                    same++;
+                    continue;
+                }
+                
+                // Normalize slope (dx,dy) by gcd and sign
+                int g = gcd(Math.abs(dx), Math.abs(dy));
+                dx /= g;
+                dy /= g;
+                
+                // Make a consistent representation for the slope:
+                // ensure dx >= 0; if dx == 0 then dy > 0
+                if (dx < 0) {
+                    dx = -dx;
+                    dy = -dy;
+                } else if (dx == 0 && dy < 0) {
+                    // vertical line: keep dy positive
+                    dy = -dy;
+                }
+                
+                long key = (((long)dx) << 32) ^ (dy & 0xffffffffL);
+                int c = count.getOrDefault(key, 0) + 1;
+                count.put(key, c);
+                localMax = Math.max(localMax, c);
+            }
+            
+            ans = Math.max(ans, localMax + 1 + same); // +1 for point i itself
+            // small optimization: if ans already >= remaining points + 1, can break; omitted for clarity
+        }
+        
+        return ans;
+    }
+    
+    private int gcd(int a, int b) {
+        if (b == 0) return a;
+        return gcd(b, a % b);
+    }
+}
