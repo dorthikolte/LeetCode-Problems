@@ -1,0 +1,56 @@
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public List<Node> neighbors;
+    public Node() {
+        val = 0;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val) {
+        val = _val;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val, ArrayList<Node> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+}
+*/
+
+import java.util.*;
+
+class Solution {
+    public Node cloneGraph(Node node) {
+        if (node == null) return null;
+        
+        // Map original node -> cloned node
+        Map<Node, Node> map = new HashMap<>();
+        
+        // Create clone for the start node
+        Node cloneStart = new Node(node.val);
+        map.put(node, cloneStart);
+        
+        // BFS queue
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(node);
+        
+        while (!queue.isEmpty()) {
+            Node curr = queue.poll();
+            Node currClone = map.get(curr);
+            
+            for (Node nei : curr.neighbors) {
+                if (!map.containsKey(nei)) {
+                    // Clone neighbor and put into map & queue
+                    Node neiClone = new Node(nei.val);
+                    map.put(nei, neiClone);
+                    queue.add(nei);
+                }
+                // Add the cloned neighbor to the current clone's neighbors
+                currClone.neighbors.add(map.get(nei));
+            }
+        }
+        
+        return cloneStart;
+    }
+}
