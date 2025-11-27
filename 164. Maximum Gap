@@ -1,0 +1,60 @@
+class Solution {
+    public int maximumGap(int[] nums) {
+        int n = nums.length;
+        if (n < 2) return 0;
+
+        int min = nums[0], max = nums[0];
+        for (int v : nums) {
+            if (v < min) min = v;
+            if (v > max) max = v;
+        }
+        if (min == max) return 0; // all equal
+
+        // bucket size (width). Use at least 1 to avoid zero width.
+        long range = (long)max - (long)min;
+        long bucketSize = Math.max(1L, range / (n - 1)); // width of each bucket
+        int bucketCount = (int)(range / bucketSize) + 1; // number of buckets
+
+        long[] bucketMin = new long[bucketCount];
+        long[] bucketMax = new long[bucketCount];
+        boolean[] used = new boolean[bucketCount];
+
+        // initialize
+        for (int i = 0; i < bucketCount; ++i) {
+            bucketMin[i] = Long.MAX_VALUE;
+            bucketMax[i] = Long.MIN_VALUE;
+        }
+
+        // place numbers into buckets
+        for (int v : nums) {
+            int idx = (int)((v - (long)min) / bucketSize);
+            // idx in [0, bucketCount-1]
+            if (!used[idx]) {
+                used[idx] = true;
+                bucketMin[idx] = v;
+                bucketMax[idx] = v;
+            } else {
+                if (v < bucketMin[idx]) bucketMin[idx] = v;
+                if (v > bucketMax[idx]) bucketMax[idx] = v;
+            }
+        }
+
+        // scan buckets to compute max gap between consecutive non-empty buckets
+        long prevMax = -1;
+        long maxGap = 0;
+        boolean firstBucketFound = false;
+        for (int i = 0; i < bucketCount; ++i) {
+            if (!used[i]) continue;
+            if (!firstBucketFound) {
+                prevMax = bucketMax[i];
+                firstBucketFound = true;
+            } else {
+                long gap = bucketMin[i] - prevMax;
+                if (gap > maxGap) maxGap = gap;
+                prevMax = bucketMax[i];
+            }
+        }
+
+        return (int)maxGap;
+    }
+}
