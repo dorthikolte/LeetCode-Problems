@@ -1,0 +1,38 @@
+class Solution {
+    public int evalRPN(String[] tokens) {
+        java.util.Deque<Integer> stack = new java.util.ArrayDeque<>();
+        
+        for (String token : tokens) {
+            switch (token) {
+                case "+":
+                    // order matters: a + b
+                    int bAdd = stack.pop();
+                    int aAdd = stack.pop();
+                    stack.push(aAdd + bAdd);
+                    break;
+                case "-":
+                    // order matters: a - b
+                    int bSub = stack.pop();
+                    int aSub = stack.pop();
+                    stack.push(aSub - bSub);
+                    break;
+                case "*":
+                    int bMul = stack.pop();
+                    int aMul = stack.pop();
+                    stack.push(aMul * bMul);
+                    break;
+                case "/":
+                    // division truncates toward zero in Java for int / int
+                    int bDiv = stack.pop();
+                    int aDiv = stack.pop();
+                    stack.push(aDiv / bDiv);
+                    break;
+                default:
+                    // it's a number
+                    stack.push(Integer.parseInt(token));
+            }
+        }
+        
+        return stack.pop();
+    }
+}
