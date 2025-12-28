@@ -1,0 +1,56 @@
+class Trie {
+
+    // Trie node definition
+    private static class TrieNode {
+        TrieNode[] children = new TrieNode[26];
+        boolean isEndOfWord = false;
+    }
+
+    private TrieNode root;
+
+    /** Initialize the trie */
+    public Trie() {
+        root = new TrieNode();
+    }
+
+    /** Inserts a word into the trie */
+    public void insert(String word) {
+        TrieNode current = root;
+
+        for (char c : word.toCharArray()) {
+            int index = c - 'a';
+            if (current.children[index] == null) {
+                current.children[index] = new TrieNode();
+            }
+            current = current.children[index];
+        }
+
+        current.isEndOfWord = true;
+    }
+
+    /** Returns true if the word is in the trie */
+    public boolean search(String word) {
+        TrieNode node = findNode(word);
+        return node != null && node.isEndOfWord;
+    }
+
+    /** Returns true if there is any word in the trie that starts with the prefix */
+    public boolean startsWith(String prefix) {
+        return findNode(prefix) != null;
+    }
+
+    /** Helper method to traverse the trie */
+    private TrieNode findNode(String str) {
+        TrieNode current = root;
+
+        for (char c : str.toCharArray()) {
+            int index = c - 'a';
+            if (current.children[index] == null) {
+                return null;
+            }
+            current = current.children[index];
+        }
+
+        return current;
+    }
+}
