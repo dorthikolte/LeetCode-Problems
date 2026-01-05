@@ -1,0 +1,30 @@
+import java.util.TreeSet;
+
+class Solution {
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int indexDiff, int valueDiff) {
+        if (indexDiff <= 0 || valueDiff < 0) return false;
+
+        TreeSet<Long> set = new TreeSet<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            long current = nums[i];
+
+            // Maintain sliding window
+            if (i > indexDiff) {
+                set.remove((long) nums[i - indexDiff - 1]);
+            }
+
+            // Find smallest number >= current - valueDiff
+            Long candidate = set.ceiling(current - valueDiff);
+
+            // Check if it's within current + valueDiff
+            if (candidate != null && candidate <= current + valueDiff) {
+                return true;
+            }
+
+            set.add(current);
+        }
+
+        return false;
+    }
+}
