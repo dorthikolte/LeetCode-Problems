@@ -1,0 +1,24 @@
+class Solution {
+    public int[] singleNumber(int[] nums) {
+        // Step 1: XOR of all numbers = a ^ b
+        int xor = 0;
+        for (int n : nums) {
+            xor ^= n;
+        }
+
+        // Step 2: Get rightmost set bit
+        int diffBit = xor & (-xor);
+
+        // Step 3: Separate into two groups
+        int a = 0, b = 0;
+        for (int n : nums) {
+            if ((n & diffBit) == 0) {
+                a ^= n;
+            } else {
+                b ^= n;
+            }
+        }
+
+        return new int[]{a, b};
+    }
+}
