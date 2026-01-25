@@ -1,0 +1,41 @@
+public class Codec {
+
+    private static final String NULL = "#";
+    private static final String SEP = ",";
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        serializeHelper(root, sb);
+        return sb.toString();
+    }
+
+    private void serializeHelper(TreeNode node, StringBuilder sb) {
+        if (node == null) {
+            sb.append(NULL).append(SEP);
+            return;
+        }
+        sb.append(node.val).append(SEP);
+        serializeHelper(node.left, sb);
+        serializeHelper(node.right, sb);
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        String[] values = data.split(SEP);
+        int[] index = new int[1]; // acts like a pointer
+        return deserializeHelper(values, index);
+    }
+
+    private TreeNode deserializeHelper(String[] values, int[] index) {
+        if (values[index[0]].equals(NULL)) {
+            index[0]++;
+            return null;
+        }
+
+        TreeNode node = new TreeNode(Integer.parseInt(values[index[0]++]));
+        node.left = deserializeHelper(values, index);
+        node.right = deserializeHelper(values, index);
+        return node;
+    }
+}
