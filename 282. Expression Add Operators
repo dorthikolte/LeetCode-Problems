@@ -1,0 +1,56 @@
+import java.util.*;
+
+class Solution {
+    public List<String> addOperators(String num, int target) {
+        List<String> result = new ArrayList<>();
+        backtrack(result, num, target, 0, 0, 0, new StringBuilder());
+        return result;
+    }
+
+    private void backtrack(List<String> result, String num, int target,
+                           int index, long value, long last,
+                           StringBuilder path) {
+
+        // If we've used all digits
+        if (index == num.length()) {
+            if (value == target) {
+                result.add(path.toString());
+            }
+            return;
+        }
+
+        for (int i = index; i < num.length(); i++) {
+            // Prevent numbers with leading zeros
+            if (i != index && num.charAt(index) == '0') break;
+
+            long current = Long.parseLong(num.substring(index, i + 1));
+            int len = path.length();
+
+            if (index == 0) {
+                // First number: no operator
+                path.append(current);
+                backtrack(result, num, target, i + 1, current, current, path);
+                path.setLength(len);
+            } else {
+                // '+'
+                path.append('+').append(current);
+                backtrack(result, num, target, i + 1,
+                          value + current, current, path);
+                path.setLength(len);
+
+                // '-'
+                path.append('-').append(current);
+                backtrack(result, num, target, i + 1,
+                          value - current, -current, path);
+                path.setLength(len);
+
+                // '*'
+                path.append('*').append(current);
+                backtrack(result, num, target, i + 1,
+                          value - last + last * current,
+                          last * current, path);
+                path.setLength(len);
+            }
+        }
+    }
+}
