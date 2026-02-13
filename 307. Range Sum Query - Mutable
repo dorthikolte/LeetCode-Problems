@@ -1,0 +1,51 @@
+class NumArray {
+
+    private int[] tree;   // Fenwick Tree
+    private int[] nums;   // Original array
+    private int n;
+
+    public NumArray(int[] nums) {
+        this.n = nums.length;
+        this.nums = new int[n];
+        this.tree = new int[n + 1];
+
+        // Build tree
+        for (int i = 0; i < n; i++) {
+            updateInternal(i + 1, nums[i]);
+            this.nums[i] = nums[i];
+        }
+    }
+
+    // Internal Fenwick update
+    private void updateInternal(int index, int delta) {
+        while (index <= n) {
+            tree[index] += delta;
+            index += index & -index;
+        }
+    }
+
+    // Update nums[index] = val
+    public void update(int index, int val) {
+        int diff = val - nums[index];
+        nums[index] = val;
+
+        updateInternal(index + 1, diff);
+    }
+
+    // Prefix sum [0..index]
+    private int query(int index) {
+        int sum = 0;
+
+        while (index > 0) {
+            sum += tree[index];
+            index -= index & -index;
+        }
+
+        return sum;
+    }
+
+    // Sum range [left..right]
+    public int sumRange(int left, int right) {
+        return query(right + 1) - query(left);
+    }
+}
