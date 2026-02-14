@@ -1,0 +1,65 @@
+import java.util.*;
+
+class Solution {
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        // Special case: only one node
+        if (n == 1) {
+            return Collections.singletonList(0);
+        }
+
+        // Build graph
+        List<Set<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            graph.add(new HashSet<>());
+        }
+
+        int[] degree = new int[n];
+
+        for (int[] edge : edges) {
+            int a = edge[0];
+            int b = edge[1];
+
+            graph.get(a).add(b);
+            graph.get(b).add(a);
+
+            degree[a]++;
+            degree[b]++;
+        }
+
+        // Queue for leaves
+        Queue<Integer> queue = new LinkedList<>();
+
+        // Initialize with all leaf nodes
+        for (int i = 0; i < n; i++) {
+            if (degree[i] == 1) {
+                queue.offer(i);
+            }
+        }
+
+        // Trim leaves layer by layer
+        while (n > 2) {
+            int size = queue.size();
+            n -= size;
+
+            for (int i = 0; i < size; i++) {
+                int leaf = queue.poll();
+
+                for (int neighbor : graph.get(leaf)) {
+                    degree[neighbor]--;
+
+                    if (degree[neighbor] == 1) {
+                        queue.offer(neighbor);
+                    }
+                }
+            }
+        }
+
+        // Remaining nodes are centers
+        List<Integer> result = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            result.add(queue.poll());
+        }
+
+        return result;
+    }
+}
