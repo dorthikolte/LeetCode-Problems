@@ -1,0 +1,34 @@
+class Solution {
+    public int nthSuperUglyNumber(int n, int[] primes) {
+        int k = primes.length;
+
+        // dp[i] = i-th super ugly number
+        int[] dp = new int[n];
+        dp[0] = 1;
+
+        // pointers for each prime
+        int[] idx = new int[k];
+
+        for (int i = 1; i < n; i++) {
+            long min = Long.MAX_VALUE;
+
+            // Find next minimum candidate
+            for (int j = 0; j < k; j++) {
+                long val = (long) dp[idx[j]] * primes[j];
+                min = Math.min(min, val);
+            }
+
+            dp[i] = (int) min;
+
+            // Move all pointers that produced min
+            for (int j = 0; j < k; j++) {
+                long val = (long) dp[idx[j]] * primes[j];
+                if (val == min) {
+                    idx[j]++;
+                }
+            }
+        }
+
+        return dp[n - 1];
+    }
+}
