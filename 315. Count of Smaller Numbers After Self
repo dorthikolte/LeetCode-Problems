@@ -1,0 +1,77 @@
+import java.util.*;
+
+class Solution {
+
+    // Fenwick Tree (Binary Indexed Tree)
+    class Fenwick {
+        int[] tree;
+        int n;
+
+        Fenwick(int n) {
+            this.n = n;
+            tree = new int[n + 1];
+        }
+
+        // Add value at index
+        void update(int i, int delta) {
+            while (i <= n) {
+                tree[i] += delta;
+                i += i & (-i);
+            }
+        }
+
+        // Query sum from 1 to i
+        int query(int i) {
+            int sum = 0;
+            while (i > 0) {
+                sum += tree[i];
+                i -= i & (-i);
+            }
+            return sum;
+        }
+    }
+
+    public List<Integer> countSmaller(int[] nums) {
+
+        int n = nums.length;
+        List<Integer> result = new ArrayList<>();
+
+        if (n == 0) return result;
+
+        // Coordinate Compression
+        int[] sorted = nums.clone();
+        Arrays.sort(sorted);
+
+        Map<Integer, Integer> rank = new HashMap<>();
+        int r = 1;
+
+        for (int num : sorted) {
+            if (!rank.containsKey(num)) {
+                rank.put(num, r++);
+            }
+        }
+
+        Fenwick fenwick = new Fenwick(rank.size());
+
+        int[] ans = new int[n];
+
+        // Traverse from right to left
+        for (int i = n - 1; i >= 0; i--) {
+
+            int compressed = rank.get(nums[i]);
+
+            // Count smaller numbers
+            ans[i] = fenwick.query(compressed - 1);
+
+            // Update Fenwick Tree
+            fenwick.update(compressed, 1);
+        }
+
+        // Convert array to list
+        for (int x : ans) {
+            result.add(x);
+        }
+
+        return result;
+    }
+}
