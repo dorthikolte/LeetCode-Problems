@@ -1,0 +1,84 @@
+class Solution {
+
+    public int[] maxNumber(int[] nums1, int[] nums2, int k) {
+        int m = nums1.length;
+        int n = nums2.length;
+
+        int[] best = new int[k];
+
+        // Try all valid splits
+        for (int i = Math.max(0, k - n); i <= Math.min(k, m); i++) {
+
+            int[] part1 = maxSubsequence(nums1, i);
+            int[] part2 = maxSubsequence(nums2, k - i);
+
+            int[] merged = merge(part1, part2);
+
+            if (greater(merged, 0, best, 0)) {
+                best = merged;
+            }
+        }
+
+        return best;
+    }
+
+    // Get maximum subsequence of length k
+    private int[] maxSubsequence(int[] nums, int k) {
+
+        int n = nums.length;
+        int drop = n - k;   // how many we can remove
+
+        int[] stack = new int[n];
+        int top = 0;
+
+        for (int num : nums) {
+
+            while (top > 0 && stack[top - 1] < num && drop > 0) {
+                top--;
+                drop--;
+            }
+
+            stack[top++] = num;
+        }
+
+        // Take first k elements
+        int[] res = new int[k];
+        System.arraycopy(stack, 0, res, 0, k);
+
+        return res;
+    }
+
+    // Merge two arrays into largest possible
+    private int[] merge(int[] a, int[] b) {
+
+        int k = a.length + b.length;
+        int[] res = new int[k];
+
+        int i = 0, j = 0, r = 0;
+
+        while (i < a.length || j < b.length) {
+
+            if (greater(a, i, b, j)) {
+                res[r++] = a[i++];
+            } else {
+                res[r++] = b[j++];
+            }
+        }
+
+        return res;
+    }
+
+    // Compare subarrays a[i..] and b[j..]
+    private boolean greater(int[] a, int i, int[] b, int j) {
+
+        while (i < a.length && j < b.length && a[i] == b[j]) {
+            i++;
+            j++;
+        }
+
+        if (j == b.length) return true;
+        if (i == a.length) return false;
+
+        return a[i] > b[j];
+    }
+}
