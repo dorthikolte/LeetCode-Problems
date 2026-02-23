@@ -1,0 +1,66 @@
+class Solution {
+    
+    public void wiggleSort(int[] nums) {
+        int n = nums.length;
+        
+        // Step 1: Find median
+        int median = findKth(nums, 0, n - 1, (n + 1) / 2);
+        
+        // Step 2: 3-way partition with virtual indexing
+        int left = 0, i = 0, right = n - 1;
+        
+        while (i <= right) {
+            int mappedI = newIndex(i, n);
+            
+            if (nums[mappedI] > median) {
+                swap(nums, newIndex(left++, n), mappedI);
+                i++;
+            } 
+            else if (nums[mappedI] < median) {
+                swap(nums, newIndex(right--, n), mappedI);
+            } 
+            else {
+                i++;
+            }
+        }
+    }
+    
+    // Virtual index mapping
+    private int newIndex(int i, int n) {
+        return (1 + 2 * i) % (n | 1);
+    }
+    
+    // QuickSelect to find kth smallest
+    private int findKth(int[] nums, int left, int right, int k) {
+        if (left == right) return nums[left];
+        
+        int pivotIndex = partition(nums, left, right);
+        int count = pivotIndex - left + 1;
+        
+        if (count == k) return nums[pivotIndex];
+        else if (count > k) return findKth(nums, left, pivotIndex - 1, k);
+        else return findKth(nums, pivotIndex + 1, right, k - count);
+    }
+    
+    // Partition for QuickSelect
+    private int partition(int[] nums, int left, int right) {
+        int pivot = nums[right];
+        int i = left;
+        
+        for (int j = left; j < right; j++) {
+            if (nums[j] <= pivot) {
+                swap(nums, i, j);
+                i++;
+            }
+        }
+        
+        swap(nums, i, right);
+        return i;
+    }
+    
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+}
