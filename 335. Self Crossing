@@ -1,0 +1,30 @@
+class Solution {
+    public boolean isSelfCrossing(int[] d) {
+
+        for (int i = 3; i < d.length; i++) {
+
+            // Case 1: current line crosses the line 3 steps ahead
+            if (d[i] >= d[i - 2] && d[i - 1] <= d[i - 3]) {
+                return true;
+            }
+
+            // Case 2: current line overlaps the line 4 steps ahead
+            if (i >= 4 &&
+                d[i - 1] == d[i - 3] &&
+                d[i] + d[i - 4] >= d[i - 2]) {
+                return true;
+            }
+
+            // Case 3: current line crosses the line 5 steps ahead
+            if (i >= 5 &&
+                d[i - 2] >= d[i - 4] &&
+                d[i] >= d[i - 2] - d[i - 4] &&
+                d[i - 1] >= d[i - 3] - d[i - 5] &&
+                d[i - 1] <= d[i - 3]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
