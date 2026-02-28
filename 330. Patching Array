@@ -1,0 +1,22 @@
+class Solution {
+    public int minPatches(int[] nums, int n) {
+        long miss = 1;   // smallest number we cannot form
+        int patches = 0;
+        int i = 0;
+
+        while (miss <= n) {
+            // use existing number if it helps extend coverage
+            if (i < nums.length && nums[i] <= miss) {
+                miss += nums[i];
+                i++;
+            } 
+            // otherwise patch with 'miss'
+            else {
+                miss += miss;
+                patches++;
+            }
+        }
+
+        return patches;
+    }
+}
