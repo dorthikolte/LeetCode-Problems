@@ -1,0 +1,26 @@
+class Solution {
+
+    public int rob(TreeNode root) {
+        int[] res = dfs(root);
+        return Math.max(res[0], res[1]);
+    }
+
+    // returns {rob, notRob}
+    private int[] dfs(TreeNode node) {
+        if (node == null) {
+            return new int[]{0, 0};
+        }
+
+        int[] left = dfs(node.left);
+        int[] right = dfs(node.right);
+
+        // rob this node -> cannot rob children
+        int rob = node.val + left[1] + right[1];
+
+        // don't rob this node -> take best of children
+        int notRob = Math.max(left[0], left[1]) +
+                     Math.max(right[0], right[1]);
+
+        return new int[]{rob, notRob};
+    }
+}
