@@ -1,0 +1,43 @@
+class Solution {
+    public NestedInteger deserialize(String s) {
+        if (s.charAt(0) != '[') {
+            return new NestedInteger(Integer.parseInt(s));
+        }
+
+        Stack<NestedInteger> stack = new Stack<>();
+        int i = 0;
+
+        while (i < s.length()) {
+            char c = s.charAt(i);
+
+            if (c == '[') {
+                stack.push(new NestedInteger());
+                i++;
+            } 
+            else if (c == ']') {
+                NestedInteger curr = stack.pop();
+                if (!stack.isEmpty()) {
+                    stack.peek().add(curr);
+                } else {
+                    return curr;
+                }
+                i++;
+            } 
+            else if (c == ',') {
+                i++;
+            } 
+            else { 
+                int start = i;
+                while (i < s.length() && (s.charAt(i) == '-' || Character.isDigit(s.charAt(i)))) {
+                    if (i != start && s.charAt(i) == '-') break;
+                    i++;
+                }
+
+                int num = Integer.parseInt(s.substring(start, i));
+                stack.peek().add(new NestedInteger(num));
+            }
+        }
+
+        return new NestedInteger();
+    }
+}
