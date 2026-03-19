@@ -1,0 +1,36 @@
+import java.util.*;
+
+class Solution {
+    public boolean canCross(int[] stones) {
+        Map<Integer, Set<Integer>> map = new HashMap<>();
+        
+        // Initialize map
+        for (int stone : stones) {
+            map.put(stone, new HashSet<>());
+        }
+        
+        // First jump must be 1
+        map.get(0).add(1);
+        
+        for (int stone : stones) {
+            for (int jump : map.get(stone)) {
+                int next = stone + jump;
+                
+                // If reached last stone
+                if (next == stones[stones.length - 1]) {
+                    return true;
+                }
+                
+                if (map.containsKey(next)) {
+                    if (jump - 1 > 0) {
+                        map.get(next).add(jump - 1);
+                    }
+                    map.get(next).add(jump);
+                    map.get(next).add(jump + 1);
+                }
+            }
+        }
+        
+        return false;
+    }
+}
