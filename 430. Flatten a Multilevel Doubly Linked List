@@ -1,0 +1,46 @@
+class Solution {
+    public Node flatten(Node head) {
+        if (head == null) return head;
+        dfs(head);
+        return head;
+    }
+
+    // Returns the tail of the flattened list
+    private Node dfs(Node node) {
+        Node curr = node;
+        Node last = null;
+
+        while (curr != null) {
+            Node next = curr.next;
+
+            // If current node has a child
+            if (curr.child != null) {
+                Node childHead = curr.child;
+
+                // Flatten child list
+                Node childTail = dfs(childHead);
+
+                // Connect current node with child
+                curr.next = childHead;
+                childHead.prev = curr;
+
+                // If next exists, connect child tail with next
+                if (next != null) {
+                    childTail.next = next;
+                    next.prev = childTail;
+                }
+
+                // Remove child pointer
+                curr.child = null;
+
+                last = childTail;
+            } else {
+                last = curr;
+            }
+
+            curr = next;
+        }
+
+        return last;
+    }
+}
