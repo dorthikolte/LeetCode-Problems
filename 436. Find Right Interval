@@ -1,0 +1,43 @@
+import java.util.*;
+
+class Solution {
+    public int[] findRightInterval(int[][] intervals) {
+        int n = intervals.length;
+        
+        // Step 1: store start with index
+        int[][] starts = new int[n][2];
+        for (int i = 0; i < n; i++) {
+            starts[i][0] = intervals[i][0]; // start
+            starts[i][1] = i;               // original index
+        }
+        
+        // Step 2: sort by start
+        Arrays.sort(starts, (a, b) -> a[0] - b[0]);
+        
+        int[] result = new int[n];
+        
+        // Step 3: process each interval
+        for (int i = 0; i < n; i++) {
+            int end = intervals[i][1];
+            
+            int left = 0, right = n - 1;
+            int ans = -1;
+            
+            // Binary search
+            while (left <= right) {
+                int mid = left + (right - left) / 2;
+                
+                if (starts[mid][0] >= end) {
+                    ans = starts[mid][1];
+                    right = mid - 1; // try to find smaller valid start
+                } else {
+                    left = mid + 1;
+                }
+            }
+            
+            result[i] = ans;
+        }
+        
+        return result;
+    }
+}
