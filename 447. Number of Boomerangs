@@ -1,0 +1,27 @@
+class Solution {
+    public int numberOfBoomerangs(int[][] points) {
+        int result = 0;
+        
+        for (int i = 0; i < points.length; i++) {
+            // Map: squared distance -> count of points at that distance from i
+            Map<Integer, Integer> distCount = new HashMap<>();
+            
+            for (int j = 0; j < points.length; j++) {
+                if (i == j) continue;
+                
+                int dx = points[i][0] - points[j][0];
+                int dy = points[i][1] - points[j][1];
+                int distSq = dx * dx + dy * dy;
+                
+                distCount.put(distSq, distCount.getOrDefault(distSq, 0) + 1);
+            }
+            
+            // For each distance, count permutations: c * (c-1)
+            for (int count : distCount.values()) {
+                result += count * (count - 1);
+            }
+        }
+        
+        return result;
+    }
+}
