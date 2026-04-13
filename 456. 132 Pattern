@@ -1,0 +1,26 @@
+import java.util.*;
+
+class Solution {
+    public boolean find132pattern(int[] nums) {
+        int n = nums.length;
+        Stack<Integer> stack = new Stack<>();
+        int second = Integer.MIN_VALUE; // this will act as "2" in 132
+
+        for (int i = n - 1; i >= 0; i--) {
+            // If we find a number smaller than "second", pattern found
+            if (nums[i] < second) {
+                return true;
+            }
+
+            // Update "second"
+            while (!stack.isEmpty() && nums[i] > stack.peek()) {
+                second = stack.pop();
+            }
+
+            // Push current element as potential "3"
+            stack.push(nums[i]);
+        }
+
+        return false;
+    }
+}
