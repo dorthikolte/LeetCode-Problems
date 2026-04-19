@@ -1,0 +1,63 @@
+class Solution {
+    public int getMaxRepetitions(String s1, int n1, String s2, int n2) {
+
+        // If s2 contains chars not in s1 → impossible
+        for (char c : s2.toCharArray()) {
+            if (s1.indexOf(c) == -1) return 0;
+        }
+
+        int s1Len = s1.length();
+        int s2Len = s2.length();
+
+        int index = 0;   // pointer in s2
+        int s2Count = 0;
+
+        // dp arrays
+        int[] indexRecorder = new int[n1 + 1];
+        int[] countRecorder = new int[n1 + 1];
+
+        for (int i = 1; i <= n1; i++) {
+
+            // scan one s1
+            for (int j = 0; j < s1Len; j++) {
+                if (s1.charAt(j) == s2.charAt(index)) {
+                    index++;
+                    if (index == s2Len) {
+                        index = 0;
+                        s2Count++;
+                    }
+                }
+            }
+
+            countRecorder[i] = s2Count;
+            indexRecorder[i] = index;
+
+            // check cycle
+            for (int k = 0; k < i; k++) {
+                if (indexRecorder[k] == index) {
+
+                    // found cycle
+                    int preLoopS1 = k;
+                    int inLoopS1 = i - k;
+
+                    int preLoopS2 = countRecorder[k];
+                    int inLoopS2 = countRecorder[i] - countRecorder[k];
+
+                    // remaining blocks
+                    int remaining = n1 - k;
+
+                    int loops = remaining / inLoopS1;
+                    int rest = remaining % inLoopS1;
+
+                    int totalS2 = preLoopS2
+                            + loops * inLoopS2
+                            + (countRecorder[k + rest] - countRecorder[k]);
+
+                    return totalS2 / n2;
+                }
+            }
+        }
+
+        return countRecorder[n1] / n2;
+    }
+}
