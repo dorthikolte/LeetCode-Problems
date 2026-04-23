@@ -1,0 +1,31 @@
+class Solution {
+    public int largestPalindrome(int n) {
+        if (n == 1) return 9;
+
+        long upper = (long) Math.pow(10, n) - 1;
+
+        for (long left = upper; left >= 1; left--) {
+            long palindrome = createPalindrome(left);
+
+            for (long x = upper; x * x >= palindrome; x--) {
+                if (palindrome % x == 0) {
+                    return (int) (palindrome % 1337);
+                }
+            }
+        }
+
+        return -1; // should never reach here
+    }
+
+    private long createPalindrome(long left) {
+        long res = left;
+        long temp = left;
+        
+        while (temp > 0) {
+            res = res * 10 + (temp % 10);
+            temp /= 10;
+        }
+        
+        return res;
+    }
+}
