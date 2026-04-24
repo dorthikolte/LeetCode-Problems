@@ -5,11 +5,13 @@ class Solution {
         DualHeap dh = new DualHeap(k);
         double[] res = new double[nums.length - k + 1];
 
+        // Initialize first window
         for (int i = 0; i < k; i++) {
             dh.insert(nums[i]);
         }
         res[0] = dh.getMedian();
 
+        // Slide the window
         for (int i = k; i < nums.length; i++) {
             dh.insert(nums[i]);
             dh.erase(nums[i - k]);
@@ -21,22 +23,32 @@ class Solution {
 }
 
 class DualHeap {
-    PriorityQueue<Integer> small; // max heap
-    PriorityQueue<Integer> large; // min heap
-    Map<Integer, Integer> delayed;
+    // Max heap (stores smaller half)
+    private PriorityQueue<Integer> small;
 
-    int k;
-    int smallSize, largeSize;
+    // Min heap (stores larger half)
+    private PriorityQueue<Integer> large;
+
+    // Lazy deletion map
+    private Map<Integer, Integer> delayed;
+
+    private int k;
+    private int smallSize, largeSize;
 
     public DualHeap(int k) {
         this.k = k;
-        small = new PriorityQueue<>((a, b) -> b - a);
+
+        // ✅ FIX: safe comparator (prevents overflow)
+        small = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+
         large = new PriorityQueue<>();
         delayed = new HashMap<>();
+        smallSize = 0;
+        largeSize = 0;
     }
 
     public double getMedian() {
-        if (k % 2 == 1) {
+        if ((k & 1) == 1) {
             return small.peek();
         }
         return ((long) small.peek() + large.peek()) / 2.0;
@@ -58,10 +70,14 @@ class DualHeap {
 
         if (num <= small.peek()) {
             smallSize--;
-            if (num == small.peek()) prune(small);
+            if (num == small.peek()) {
+                prune(small);
+            }
         } else {
             largeSize--;
-            if (num == large.peek()) prune(large);
+            if (num == large.peek()) {
+                prune(large);
+            }
         }
 
         makeBalance();
@@ -83,6 +99,7 @@ class DualHeap {
     }
 
     private void makeBalance() {
+        // Ensure size property: small >= large and diff <= 1
         if (smallSize > largeSize + 1) {
             large.offer(small.poll());
             smallSize--;
