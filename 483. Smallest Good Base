@@ -1,0 +1,35 @@
+class Solution {
+    public String smallestGoodBase(String n) {
+        long num = Long.parseLong(n);
+        
+        // max possible m (length-1)
+        int maxM = (int)(Math.log(num) / Math.log(2));
+        
+        // try largest m first
+        for (int m = maxM; m >= 1; m--) {
+            long left = 2, right = (long)Math.pow(num, 1.0 / m);
+            
+            while (left <= right) {
+                long k = left + (right - left) / 2;
+                
+                long sum = 1, curr = 1;
+                for (int i = 1; i <= m; i++) {
+                    curr *= k;
+                    if (curr > num) break;
+                    sum += curr;
+                }
+                
+                if (sum == num) {
+                    return String.valueOf(k);
+                } else if (sum < num) {
+                    left = k + 1;
+                } else {
+                    right = k - 1;
+                }
+            }
+        }
+        
+        // fallback: base n-1 → always "11"
+        return String.valueOf(num - 1);
+    }
+}
