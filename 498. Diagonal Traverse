@@ -1,0 +1,38 @@
+class Solution {
+    public int[] findDiagonalOrder(int[][] mat) {
+        int m = mat.length;
+        int n = mat[0].length;
+        
+        int[] result = new int[m * n];
+        int index = 0;
+        
+        for (int d = 0; d < m + n - 1; d++) {
+            // Temporary list for current diagonal
+            int[] temp = new int[Math.min(m, n)];
+            int count = 0;
+            
+            int row = d < n ? 0 : d - n + 1;
+            int col = d < n ? d : n - 1;
+            
+            // Collect elements in this diagonal
+            while (row < m && col >= 0) {
+                temp[count++] = mat[row][col];
+                row++;
+                col--;
+            }
+            
+            // Reverse if diagonal index is even
+            if (d % 2 == 0) {
+                for (int i = count - 1; i >= 0; i--) {
+                    result[index++] = temp[i];
+                }
+            } else {
+                for (int i = 0; i < count; i++) {
+                    result[index++] = temp[i];
+                }
+            }
+        }
+        
+        return result;
+    }
+}
