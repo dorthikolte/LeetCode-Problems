@@ -1,0 +1,32 @@
+class Solution {
+    public int[] findThePrefixCommonArray(int[] A, int[] B) {
+        int n = A.length;
+        int[] result = new int[n];
+        
+        boolean[] seenA = new boolean[n + 1];
+        boolean[] seenB = new boolean[n + 1];
+        
+        int common = 0;
+        
+        for (int i = 0; i < n; i++) {
+            // Mark current elements as seen
+            seenA[A[i]] = true;
+            seenB[B[i]] = true;
+            
+            // If A[i] already appeared in B, increase common count
+            if (seenB[A[i]]) {
+                common++;
+            }
+            
+            // If B[i] already appeared in A and A[i] != B[i],
+            // increase common count
+            if (A[i] != B[i] && seenA[B[i]]) {
+                common++;
+            }
+            
+            result[i] = common;
+        }
+        
+        return result;
+    }
+}
