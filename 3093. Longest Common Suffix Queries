@@ -1,0 +1,76 @@
+class Solution {
+
+    class TrieNode {
+        TrieNode[] children = new TrieNode[26];
+
+        // best index for this suffix
+        int idx;
+        int len;
+
+        TrieNode(int idx, int len) {
+            this.idx = idx;
+            this.len = len;
+        }
+    }
+
+    public int[] stringIndices(String[] wordsContainer, String[] wordsQuery) {
+
+        // global best (smallest length, earliest index)
+        int bestIdx = 0;
+        for (int i = 1; i < wordsContainer.length; i++) {
+            if (wordsContainer[i].length() < wordsContainer[bestIdx].length()) {
+                bestIdx = i;
+            }
+        }
+
+        TrieNode root = new TrieNode(bestIdx, wordsContainer[bestIdx].length());
+
+        // Build reversed trie
+        for (int i = 0; i < wordsContainer.length; i++) {
+            String word = wordsContainer[i];
+            TrieNode node = root;
+
+            // insert reversed word
+            for (int j = word.length() - 1; j >= 0; j--) {
+                int c = word.charAt(j) - 'a';
+
+                if (node.children[c] == null) {
+                    node.children[c] = new TrieNode(i, word.length());
+                }
+
+                node = node.children[c];
+
+                // update best candidate for this suffix
+                if (word.length() < node.len) {
+                    node.len = word.length();
+                    node.idx = i;
+                }
+            }
+        }
+
+        int[] ans = new int[wordsQuery.length];
+
+        // Query
+        for (int i = 0; i < wordsQuery.length; i++) {
+            String q = wordsQuery[i];
+            TrieNode node = root;
+
+            int res = root.idx;
+
+            for (int j = q.length() - 1; j >= 0; j--) {
+                int c = q.charAt(j) - 'a';
+
+                if (node.children[c] == null) {
+                    break;
+                }
+
+                node = node.children[c];
+                res = node.idx;
+            }
+
+            ans[i] = res;
+        }
+
+        return ans;
+    }
+}
