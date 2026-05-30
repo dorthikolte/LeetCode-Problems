@@ -1,0 +1,84 @@
+import java.util.*;
+
+class Solution {
+    static class FenwickMax {
+        int n;
+        int[] bit;
+
+        FenwickMax(int n) {
+            this.n = n;
+            bit = new int[n + 2];
+        }
+
+        void update(int idx, int val) {
+            for (int i = idx; i <= n; i += i & -i) {
+                bit[i] = Math.max(bit[i], val);
+            }
+        }
+
+        int query(int idx) {
+            int res = 0;
+            for (int i = idx; i > 0; i -= i & -i) {
+                res = Math.max(res, bit[i]);
+            }
+            return res;
+        }
+    }
+
+    public List<Boolean> getResults(int[][] queries) {
+        int maxX = 0;
+
+        TreeSet<Integer> obstacles = new TreeSet<>();
+        for (int[] q : queries) {
+            maxX = Math.max(maxX, q[1]);
+            if (q[0] == 1) {
+                obstacles.add(q[1]);
+            }
+        }
+
+        FenwickMax bit = new FenwickMax(maxX + 2);
+
+        // Final state: all obstacles inserted.
+        int prev = 0;
+        for (int pos : obstacles) {
+            bit.update(pos, pos - prev);
+            prev = pos;
+        }
+
+        List<Boolean> ans = new ArrayList<>();
+        TreeSet<Integer> set = new TreeSet<>(obstacles);
+
+        for (int i = queries.length - 1; i >= 0; i--) {
+            int[] q = queries[i];
+
+            if (q[0] == 2) {
+                int x = q[1];
+                int sz = q[2];
+
+                Integer preObj = set.floor(x);
+                int pre = (preObj == null) ? 0 : preObj;
+
+                int bestGapBefore = bit.query(pre);
+                int tailGap = x - pre;
+
+                ans.add(Math.max(bestGapBefore, tailGap) >= sz);
+            } else {
+                int p = q[1];
+
+                Integer leftObj = set.lower(p);
+                Integer rightObj = set.higher(p);
+
+                int left = (leftObj == null) ? 0 : leftObj;
+
+                if (rightObj != null) {
+                    bit.update(rightObj, rightObj - left);
+                }
+
+                set.remove(p);
+            }
+        }
+
+        Collections.reverse(ans);
+        return ans;
+    }
+}
