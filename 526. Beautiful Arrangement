@@ -1,0 +1,35 @@
+class Solution {
+    private int[] dp;
+    private int n;
+
+    public int countArrangement(int n) {
+        this.n = n;
+        dp = new int[1 << n];
+        return dfs(1, 0);
+    }
+
+    private int dfs(int pos, int mask) {
+        if (pos > n) {
+            return 1;
+        }
+
+        if (dp[mask] != 0) {
+            return dp[mask];
+        }
+
+        int count = 0;
+
+        for (int num = 1; num <= n; num++) {
+            int bit = 1 << (num - 1);
+
+            if ((mask & bit) == 0 &&
+                (num % pos == 0 || pos % num == 0)) {
+
+                count += dfs(pos + 1, mask | bit);
+            }
+        }
+
+        dp[mask] = count;
+        return count;
+    }
+}
