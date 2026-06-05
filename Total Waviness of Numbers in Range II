@@ -1,0 +1,83 @@
+class Solution {
+    private char[] digits;
+    private long[][][][] cntMemo;
+    private long[][][][] sumMemo;
+    private boolean[][][][] seen;
+
+    public long totalWaviness(long num1, long num2) {
+        return solve(num2) - solve(num1 - 1);
+    }
+
+    private long solve(long n) {
+        if (n < 0) return 0;
+
+        digits = Long.toString(n).toCharArray();
+        int m = digits.length;
+
+        cntMemo = new long[m + 1][3][10][10];
+        sumMemo = new long[m + 1][3][10][10];
+        seen = new boolean[m + 1][3][10][10];
+
+        long[] res = dfs(0, true, 0, 0, 0);
+        return res[1];
+    }
+
+    // Returns {countNumbers, totalWaviness}
+    private long[] dfs(int pos, boolean tight, int lenState, int a, int b) {
+        if (pos == digits.length) {
+            return new long[]{1L, 0L};
+        }
+
+        if (!tight && seen[pos][lenState][a][b]) {
+            return new long[]{
+                cntMemo[pos][lenState][a][b],
+                sumMemo[pos][lenState][a][b]
+            };
+        }
+
+        int limit = tight ? digits[pos] - '0' : 9;
+
+        long totalCount = 0;
+        long totalWaviness = 0;
+
+        for (int d = 0; d <= limit; d++) {
+            boolean nextTight = tight && (d == limit);
+
+            long[] child;
+
+            if (lenState == 0) {
+                // Number has not started yet.
+                if (d == 0) {
+                    child = dfs(pos + 1, nextTight, 0, 0, 0);
+                } else {
+                    child = dfs(pos + 1, nextTight, 1, d, 0);
+                }
+            } else if (lenState == 1) {
+                // One digit already chosen.
+                child = dfs(pos + 1, nextTight, 2, a, d);
+            } else {
+                // We already have at least two digits.
+                int add = ((b > a && b > d) || (b < a && b < d)) ? 1 : 0;
+
+                child = dfs(pos + 1, nextTight, 2, b, d);
+
+                // Every number in the child subtree gains this contribution.
+                child = new long[]{
+                    child[0],
+                    child[1] + child[0] * add
+                };
+            }
+
+            totalCount += child[0];
+            totalWaviness += child[1];
+        }
+
+        if (!tight) {
+            seen[pos][lenState][a][b] = true;
+            cntMemo[pos][lenState][a][b] = totalCount;
+            sumMemo[pos][lenState][a][b] = totalWaviness;
+        }
+
+        return new long[]{totalCount, totalWaviness};
+    }
+}
