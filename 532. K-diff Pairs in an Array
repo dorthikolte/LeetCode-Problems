@@ -1,0 +1,29 @@
+import java.util.*;
+
+class Solution {
+    public int findPairs(int[] nums, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+
+        for (int num : nums) {
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
+        }
+
+        int count = 0;
+
+        if (k == 0) {
+            for (int value : freq.values()) {
+                if (value > 1) {
+                    count++;
+                }
+            }
+        } else {
+            for (int num : freq.keySet()) {
+                if (freq.containsKey(num + k)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+}
