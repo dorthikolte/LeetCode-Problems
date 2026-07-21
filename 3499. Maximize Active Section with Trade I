@@ -1,0 +1,36 @@
+class Solution {
+    public int maxActiveSectionsAfterTrade(String s) {
+        int n = s.length();
+        int active = 0;
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) == '1') active++;
+        }
+
+        String t = "1" + s + "1";
+
+        java.util.ArrayList<Character> chars = new java.util.ArrayList<>();
+        java.util.ArrayList<Integer> lens = new java.util.ArrayList<>();
+
+        int i = 0;
+        while (i < t.length()) {
+            char c = t.charAt(i);
+            int j = i;
+            while (j < t.length() && t.charAt(j) == c) j++;
+            chars.add(c);
+            lens.add(j - i);
+            i = j;
+        }
+
+        int ans = active;
+
+        for (int k = 1; k < chars.size() - 1; k++) {
+            if (chars.get(k) == '1'
+                    && chars.get(k - 1) == '0'
+                    && chars.get(k + 1) == '0') {
+                ans = Math.max(ans, active + lens.get(k - 1) + lens.get(k + 1));
+            }
+        }
+
+        return ans;
+    }
+}
