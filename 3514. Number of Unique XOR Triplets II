@@ -1,0 +1,41 @@
+class Solution {
+    public int uniqueXorTriplets(int[] nums) {
+        boolean[] seen = new boolean[2048];
+        int[] values = new int[nums.length];
+        int m = 0;
+
+        // Keep only distinct values
+        for (int x : nums) {
+            if (!seen[x]) {
+                seen[x] = true;
+                values[m++] = x;
+            }
+        }
+
+        boolean[] pair = new boolean[2048];
+
+        // All XORs of two values (repetition allowed)
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                pair[values[i] ^ values[j]] = true;
+            }
+        }
+
+        boolean[] ans = new boolean[2048];
+
+        // XOR with the third value
+        for (int x = 0; x < 2048; x++) {
+            if (!pair[x]) continue;
+            for (int i = 0; i < m; i++) {
+                ans[x ^ values[i]] = true;
+            }
+        }
+
+        int count = 0;
+        for (boolean b : ans) {
+            if (b) count++;
+        }
+
+        return count;
+    }
+}
