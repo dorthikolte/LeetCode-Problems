@@ -1,0 +1,164 @@
+class Solution {
+    static final int[][] cnt = {
+            {0,0,0,0}, //0
+            {0,0,0,0}, //1
+            {1,0,0,0}, //2
+            {0,1,0,0}, //3
+            {2,0,0,0}, //4
+            {0,0,1,0}, //5
+            {1,1,0,0}, //6
+            {0,0,0,1}, //7
+            {3,0,0,0}, //8
+            {0,2,0,0}  //9
+    };
+
+    int need2, need3, need5, need7;
+
+    public String smallestNumber(String num, long t) {
+
+        long x = t;
+
+        while (x % 2 == 0) {
+            need2++;
+            x /= 2;
+        }
+        while (x % 3 == 0) {
+            need3++;
+            x /= 3;
+        }
+        while (x % 5 == 0) {
+            need5++;
+            x /= 5;
+        }
+        while (x % 7 == 0) {
+            need7++;
+            x /= 7;
+        }
+
+        if (x != 1) return "-1";
+
+        int n = num.length();
+
+        int[] pre2 = new int[n + 1];
+        int[] pre3 = new int[n + 1];
+        int[] pre5 = new int[n + 1];
+        int[] pre7 = new int[n + 1];
+
+        boolean zero = false;
+
+        for (int i = 0; i < n; i++) {
+            int d = num.charAt(i) - '0';
+            if (d == 0) zero = true;
+
+            pre2[i + 1] = pre2[i];
+            pre3[i + 1] = pre3[i];
+            pre5[i + 1] = pre5[i];
+            pre7[i + 1] = pre7[i];
+
+            if (d != 0) {
+                pre2[i + 1] += cnt[d][0];
+                pre3[i + 1] += cnt[d][1];
+                pre5[i + 1] += cnt[d][2];
+                pre7[i + 1] += cnt[d][3];
+            }
+        }
+
+        if (!zero &&
+                pre2[n] >= need2 &&
+                pre3[n] >= need3 &&
+                pre5[n] >= need5 &&
+                pre7[n] >= need7)
+            return num;
+
+        char[] ans = num.toCharArray();
+
+        for (int i = n - 1; i >= 0; i--) {
+
+            int cur = num.charAt(i) - '0';
+
+            int have2 = pre2[i];
+            int have3 = pre3[i];
+            int have5 = pre5[i];
+            int have7 = pre7[i];
+
+            for (int d = Math.max(cur + 1, 1); d <= 9; d++) {
+
+                int r2 = Math.max(0, need2 - have2 - cnt[d][0]);
+                int r3 = Math.max(0, need3 - have3 - cnt[d][1]);
+                int r5 = Math.max(0, need5 - have5 - cnt[d][2]);
+                int r7 = Math.max(0, need7 - have7 - cnt[d][3]);
+
+                int left = n - i - 1;
+
+                if (r2 > left * 3) continue;
+                if (r3 > left * 2) continue;
+                if (r5 > left) continue;
+                if (r7 > left) continue;
+
+                ans[i] = (char)(d + '0');
+
+                int a2 = r2, a3 = r3, a5 = r5, a7 = r7;
+
+                for (int j = i + 1; j < n; j++) {
+                    for (int dig = 1; dig <= 9; dig++) {
+
+                        int b2 = Math.max(0, a2 - cnt[dig][0]);
+                        int b3 = Math.max(0, a3 - cnt[dig][1]);
+                        int b5 = Math.max(0, a5 - cnt[dig][2]);
+                        int b7 = Math.max(0, a7 - cnt[dig][3]);
+
+                        int rem = n - j - 1;
+
+                        if (b2 <= rem * 3 &&
+                                b3 <= rem * 2 &&
+                                b5 <= rem &&
+                                b7 <= rem) {
+
+                            ans[j] = (char)(dig + '0');
+                            a2 = b2;
+                            a3 = b3;
+                            a5 = b5;
+                            a7 = b7;
+                            break;
+                        }
+                    }
+                }
+
+                return new String(ans);
+            }
+        }
+
+        // need one extra digit
+        StringBuilder sb = new StringBuilder();
+        int len = n + 1;
+
+        int a2 = need2, a3 = need3, a5 = need5, a7 = need7;
+
+        for (int pos = 0; pos < len; pos++) {
+            for (int d = 1; d <= 9; d++) {
+
+                int b2 = Math.max(0, a2 - cnt[d][0]);
+                int b3 = Math.max(0, a3 - cnt[d][1]);
+                int b5 = Math.max(0, a5 - cnt[d][2]);
+                int b7 = Math.max(0, a7 - cnt[d][3]);
+
+                int rem = len - pos - 1;
+
+                if (b2 <= rem * 3 &&
+                        b3 <= rem * 2 &&
+                        b5 <= rem &&
+                        b7 <= rem) {
+
+                    sb.append((char)(d + '0'));
+                    a2 = b2;
+                    a3 = b3;
+                    a5 = b5;
+                    a7 = b7;
+                    break;
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+}
