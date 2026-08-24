@@ -1,0 +1,32 @@
+class Solution {
+    public String tree2str(TreeNode root) {
+        if (root == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(root.val);
+
+        // Left child
+        if (root.left != null) {
+            sb.append("(");
+            sb.append(tree2str(root.left));
+            sb.append(")");
+        }
+
+        // Right child
+        if (root.right != null) {
+            // Left child is absent, so we must represent it as ()
+            if (root.left == null) {
+                sb.append("()");
+            }
+
+            sb.append("(");
+            sb.append(tree2str(root.right));
+            sb.append(")");
+        }
+
+        return sb.toString();
+    }
+}
