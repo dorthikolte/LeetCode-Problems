@@ -1,0 +1,24 @@
+class Solution {
+    public boolean uniformArray(int[] nums1) {
+        int min = Integer.MAX_VALUE;
+        
+        for (int num : nums1) {
+            min = Math.min(min, num);
+        }
+
+        // If minimum is odd, we can make every element odd.
+        if (min % 2 == 1) {
+            return true;
+        }
+
+        // Minimum is even.
+        // If all numbers are already even, we're done.
+        for (int num : nums1) {
+            if (num % 2 == 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
