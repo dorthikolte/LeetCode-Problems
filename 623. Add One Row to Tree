@@ -1,0 +1,56 @@
+import java.util.*;
+
+class Solution {
+    public TreeNode addOneRow(TreeNode root, int val, int depth) {
+        
+        // Special case: add a new root
+        if (depth == 1) {
+            TreeNode newRoot = new TreeNode(val);
+            newRoot.left = root;
+            return newRoot;
+        }
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        int currentDepth = 1;
+
+        // Traverse until depth - 1
+        while (currentDepth < depth - 1) {
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+                TreeNode curr = queue.poll();
+
+                if (curr.left != null) {
+                    queue.offer(curr.left);
+                }
+
+                if (curr.right != null) {
+                    queue.offer(curr.right);
+                }
+            }
+
+            currentDepth++;
+        }
+
+        // Now queue contains all nodes at depth - 1
+        while (!queue.isEmpty()) {
+            TreeNode curr = queue.poll();
+
+            // Save original children
+            TreeNode originalLeft = curr.left;
+            TreeNode originalRight = curr.right;
+
+            // Create new nodes
+            curr.left = new TreeNode(val);
+            curr.right = new TreeNode(val);
+
+            // Attach original subtrees
+            curr.left.left = originalLeft;
+            curr.right.right = originalRight;
+        }
+
+        return root;
+    }
+}
