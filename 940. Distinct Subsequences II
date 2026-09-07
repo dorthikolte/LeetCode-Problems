@@ -1,0 +1,24 @@
+class Solution {
+    public int distinctSubseqII(String s) {
+        final int MOD = 1_000_000_007;
+
+        // dp = number of distinct subsequences including the empty subsequence
+        long dp = 1;
+
+        // last[c] = value of dp before the previous occurrence of character c
+        long[] last = new long[26];
+
+        for (char ch : s.toCharArray()) {
+            int idx = ch - 'a';
+
+            long newDp = (2 * dp % MOD - last[idx] + MOD) % MOD;
+
+            // Store dp before processing this character
+            last[idx] = dp;
+            dp = newDp;
+        }
+
+        // Exclude the empty subsequence
+        return (int) ((dp - 1 + MOD) % MOD);
+    }
+}
