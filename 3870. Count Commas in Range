@@ -1,0 +1,15 @@
+class Solution {
+    public int countCommas(int n) {
+        int count = 0;
+        
+        // Numbers from 1,000 to 999,999 have at least 1 comma
+        if (n >= 1000) {
+            count += n - 1000 + 1;
+        }
+        
+        // Numbers from 1,000,000 onwards would have 2 commas
+        // (Not needed for n <= 10^5, but useful for generalization)
+        
+        return count;
+    }
+}
