@@ -1,0 +1,39 @@
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int totalNumbers(int[] digits) {
+        Set<Integer> set = new HashSet<>();
+
+        int n = digits.length;
+
+        // Choose 3 different indices
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+
+                    // Same digit copy cannot be used twice
+                    if (i == j || j == k || i == k)
+                        continue;
+
+                    // First digit cannot be 0 (no leading zero)
+                    if (digits[i] == 0)
+                        continue;
+
+                    // Last digit must be even
+                    if (digits[k] % 2 != 0)
+                        continue;
+
+                    int number = digits[i] * 100
+                               + digits[j] * 10
+                               + digits[k];
+
+                    // HashSet keeps only distinct numbers
+                    set.add(number);
+                }
+            }
+        }
+
+        return set.size();
+    }
+}
