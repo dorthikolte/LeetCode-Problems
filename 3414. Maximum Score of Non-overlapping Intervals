@@ -1,0 +1,147 @@
+import java.util.*;
+
+class Solution {
+
+    static class Interval {
+        long start, end, weight;
+        int index;
+
+        Interval(long start, long end, long weight, int index) {
+            this.start = start;
+            this.end = end;
+            this.weight = weight;
+            this.index = index;
+        }
+    }
+
+    static class State {
+        long score;
+        int[] indices;
+
+        State(long score, int[] indices) {
+            this.score = score;
+            this.indices = indices;
+        }
+    }
+
+    public int[] maximumWeight(List<List<Integer>> intervals) {
+        int n = intervals.size();
+        Interval[] arr = new Interval[n];
+
+        for (int i = 0; i < n; i++) {
+            arr[i] = new Interval(
+                intervals.get(i).get(0),
+                intervals.get(i).get(1),
+                intervals.get(i).get(2),
+                i
+            );
+        }
+
+        // Sort by start position
+        Arrays.sort(arr, (a, b) -> {
+            if (a.start != b.start) {
+                return Long.compare(a.start, b.start);
+            }
+            return Long.compare(a.end, b.end);
+        });
+
+        long[] starts = new long[n];
+        for (int i = 0; i < n; i++) {
+            starts[i] = arr[i].start;
+        }
+
+        // next[i] = first interval with start > arr[i].end
+        int[] next = new int[n];
+        for (int i = 0; i < n; i++) {
+            next[i] = upperBound(starts, arr[i].end);
+        }
+
+        State[][] dp = new State[5][n + 1];
+
+        // IMPORTANT: Initialize ALL states for k = 0.
+        // With 0 intervals allowed, the best score is always 0.
+        for (int i = 0; i <= n; i++) {
+            dp[0][i] = new State(0, new int[0]);
+        }
+
+        // Base case: no intervals remaining
+        for (int k = 1; k <= 4; k++) {
+            dp[k][n] = new State(0, new int[0]);
+        }
+
+        for (int k = 1; k <= 4; k++) {
+            for (int i = n - 1; i >= 0; i--) {
+
+                // Skip current interval
+                State skip = dp[k][i + 1];
+
+                // Take current interval
+                State future = dp[k - 1][next[i]];
+
+                int[] chosen = addIndex(
+                    future.indices,
+                    arr[i].index
+                );
+
+                State take = new State(
+                    future.score + arr[i].weight,
+                    chosen
+                );
+
+                dp[k][i] = better(skip, take);
+            }
+        }
+
+        return dp[4][0].indices;
+    }
+
+    // Find first index where starts[index] > target
+    private int upperBound(long[] starts, long target) {
+        int left = 0;
+        int right = starts.length;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            if (starts[mid] <= target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return left;
+    }
+
+    private int[] addIndex(int[] indices, int index) {
+        int[] result = Arrays.copyOf(indices, indices.length + 1);
+        result[indices.length] = index;
+
+        // At most 4 elements, so sorting is effectively constant time
+        Arrays.sort(result);
+
+        return result;
+    }
+
+    private State better(State a, State b) {
+        if (a.score != b.score) {
+            return a.score > b.score ? a : b;
+        }
+
+        return lexicographicallySmaller(a.indices, b.indices)
+            ? a
+            : b;
+    }
+
+    private boolean lexicographicallySmaller(int[] a, int[] b) {
+        int len = Math.min(a.length, b.length);
+
+        for (int i = 0; i < len; i++) {
+            if (a[i] != b[i]) {
+                return a[i] < b[i];
+            }
+        }
+
+        return a.length < b.length;
+    }
+}
