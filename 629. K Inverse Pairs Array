@@ -1,0 +1,28 @@
+class Solution {
+    private static final int MOD = 1_000_000_007;
+
+    public int kInversePairs(int n, int k) {
+        int[] dp = new int[k + 1];
+        dp[0] = 1;
+
+        for (int i = 1; i <= n; i++) {
+            int[] next = new int[k + 1];
+            long window = 0;
+
+            for (int j = 0; j <= k; j++) {
+                window += dp[j];
+
+                if (j >= i) {
+                    window -= dp[j - i];
+                }
+
+                window = (window + MOD) % MOD;
+                next[j] = (int) window;
+            }
+
+            dp = next;
+        }
+
+        return dp[k];
+    }
+}
