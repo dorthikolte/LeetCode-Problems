@@ -1,0 +1,150 @@
+import java.util.*;
+
+class Solution {
+    static class Node {
+        int prod;
+        int[] pref, suff, ans;
+
+        Node(int k) {
+            prod = 1 % k;
+            pref = new int[k];
+            suff = new int[k];
+            ans = new int[k];
+        }
+    }
+
+    int k;
+    Node[] tree;
+
+    public int[] resultArray(int[] nums, int k, int[][] queries) {
+        this.k = k;
+
+        int n = nums.length;
+        int size = 1;
+        while (size < n) size <<= 1;
+
+        tree = new Node[2 * size];
+
+        for (int i = 0; i < 2 * size; i++) {
+            tree[i] = new Node(k);
+        }
+
+        for (int i = 0; i < n; i++) {
+            tree[size + i] = makeLeaf(nums[i]);
+        }
+
+        for (int i = size - 1; i >= 1; i--) {
+            tree[i] = merge(tree[i << 1], tree[i << 1 | 1]);
+        }
+
+        int[] result = new int[queries.length];
+
+        for (int qi = 0; qi < queries.length; qi++) {
+            int index = queries[qi][0];
+            int value = queries[qi][1];
+            int start = queries[qi][2];
+            int x = queries[qi][3];
+
+            update(size + index, value);
+
+            Node res = query(start + size, n - 1 + size);
+
+            result[qi] = res.pref[x];
+        }
+
+        return result;
+    }
+
+    private Node makeLeaf(int value) {
+        Node node = new Node(k);
+
+        int r = value % k;
+
+        node.prod = r;
+        node.pref[r] = 1;
+        node.suff[r] = 1;
+        node.ans[r] = 1;
+
+        return node;
+    }
+
+    private Node merge(Node a, Node b) {
+        Node c = new Node(k);
+
+        c.prod = (a.prod * b.prod) % k;
+
+        // Prefixes entirely in a
+        for (int r = 0; r < k; r++) {
+            c.pref[r] += a.pref[r];
+        }
+
+        // Prefixes spanning all of a and part of b
+        for (int r = 0; r < k; r++) {
+            int nr = (a.prod * r) % k;
+            c.pref[nr] += b.pref[r];
+        }
+
+        // Suffixes entirely in b
+        for (int r = 0; r < k; r++) {
+            c.suff[r] += b.suff[r];
+        }
+
+        // Suffixes spanning part of a and all of b
+        for (int r = 0; r < k; r++) {
+            int nr = (r * b.prod) % k;
+            c.suff[nr] += a.suff[r];
+        }
+
+        // Subarrays entirely in a or b
+        for (int r = 0; r < k; r++) {
+            c.ans[r] += a.ans[r];
+            c.ans[r] += b.ans[r];
+        }
+
+        // Crossing subarrays
+        for (int i = 0; i < k; i++) {
+            for (int j = 0; j < k; j++) {
+                int nr = (i * j) % k;
+                c.ans[nr] += a.suff[i] * b.pref[j];
+            }
+        }
+
+        return c;
+    }
+
+    private void update(int pos, int value) {
+        tree[pos] = makeLeaf(value);
+
+        pos >>= 1;
+
+        while (pos > 0) {
+            tree[pos] = merge(tree[pos << 1], tree[pos << 1 | 1]);
+            pos >>= 1;
+        }
+    }
+
+    private Node query(int l, int r) {
+        Node left = null;
+        Node right = null;
+
+        while (l <= r) {
+            if ((l & 1) == 1) {
+                left = (left == null) ? tree[l] : merge(left, tree[l]);
+                l++;
+            }
+
+            if ((r & 1) == 0) {
+                right = (right == null) ? tree[r] : merge(tree[r], right);
+                r--;
+            }
+
+            l >>= 1;
+            r >>= 1;
+        }
+
+        if (left == null) return right;
+        if (right == null) return left;
+
+        return merge(left, right);
+    }
+}
