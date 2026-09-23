@@ -1,0 +1,58 @@
+import java.util.*;
+
+class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+        int k = nums.size();
+
+        // Min heap: [value, listIndex, elementIndex]
+        PriorityQueue<int[]> pq = new PriorityQueue<>(
+            (a, b) -> Integer.compare(a[0], b[0])
+        );
+
+        int currentMax = Integer.MIN_VALUE;
+
+        // Initialize heap with the first element of every list
+        for (int i = 0; i < k; i++) {
+            int value = nums.get(i).get(0);
+
+            pq.offer(new int[]{value, i, 0});
+            currentMax = Math.max(currentMax, value);
+        }
+
+        int bestStart = 0;
+        int bestEnd = Integer.MAX_VALUE;
+
+        while (pq.size() == k) {
+            int[] minElement = pq.poll();
+
+            int currentMin = minElement[0];
+            int listIndex = minElement[1];
+            int elementIndex = minElement[2];
+
+            // Update answer
+            if (currentMax - currentMin < bestEnd - bestStart) {
+                bestStart = currentMin;
+                bestEnd = currentMax;
+            }
+
+            // Move to the next element in the same list
+            elementIndex++;
+
+            if (elementIndex >= nums.get(listIndex).size()) {
+                break;
+            }
+
+            int nextValue = nums.get(listIndex).get(elementIndex);
+
+            pq.offer(new int[]{
+                nextValue,
+                listIndex,
+                elementIndex
+            });
+
+            currentMax = Math.max(currentMax, nextValue);
+        }
+
+        return new int[]{bestStart, bestEnd};
+    }
+}
