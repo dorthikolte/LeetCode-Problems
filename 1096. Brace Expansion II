@@ -1,0 +1,78 @@
+class Solution {
+    private String s;
+    private int i;
+
+    public List<String> braceExpansionII(String expression) {
+        s = expression;
+        i = 0;
+
+        Set<String> result = parseExpression();
+
+        List<String> ans = new ArrayList<>(result);
+        Collections.sort(ans);
+        return ans;
+    }
+
+    // expression := term (',' term)*
+    private Set<String> parseExpression() {
+        Set<String> result = new HashSet<>();
+
+        while (i < s.length() && s.charAt(i) != '}') {
+            Set<String> term = parseTerm();
+            result.addAll(term);
+
+            if (i < s.length() && s.charAt(i) == ',') {
+                i++; // consume ','
+            } else {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    // term := factor factor*
+    private Set<String> parseTerm() {
+        Set<String> result = new HashSet<>();
+        result.add("");
+
+        while (i < s.length()
+                && s.charAt(i) != '}'
+                && s.charAt(i) != ',') {
+
+            Set<String> factor = parseFactor();
+
+            Set<String> next = new HashSet<>();
+
+            for (String a : result) {
+                for (String b : factor) {
+                    next.add(a + b);
+                }
+            }
+
+            result = next;
+        }
+
+        return result;
+    }
+
+    // factor := letter | '{' expression '}'
+    private Set<String> parseFactor() {
+        if (s.charAt(i) == '{') {
+            i++; // consume '{'
+
+            Set<String> result = parseExpression();
+
+            i++; // consume '}'
+
+            return result;
+        }
+
+        // lowercase letter
+        Set<String> result = new HashSet<>();
+        result.add(String.valueOf(s.charAt(i)));
+        i++;
+
+        return result;
+    }
+}
