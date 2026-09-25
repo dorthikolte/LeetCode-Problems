@@ -1,0 +1,60 @@
+class Solution {
+    public String solveEquation(String equation) {
+        String[] sides = equation.split("=");
+
+        int[] left = parse(sides[0]);
+        int[] right = parse(sides[1]);
+
+        int coeff = left[0] - right[0];
+        int constant = right[1] - left[1];
+
+        if (coeff == 0) {
+            if (constant == 0) {
+                return "Infinite solutions";
+            }
+            return "No solution";
+        }
+
+        int x = constant / coeff;
+        return "x=" + x;
+    }
+
+    // Returns [coefficientOfX, constant]
+    private int[] parse(String s) {
+        int coeff = 0;
+        int constant = 0;
+
+        int i = 0;
+        int n = s.length();
+
+        while (i < n) {
+            int sign = 1;
+
+            if (s.charAt(i) == '+') {
+                i++;
+            } else if (s.charAt(i) == '-') {
+                sign = -1;
+                i++;
+            }
+
+            int num = 0;
+            boolean hasNumber = false;
+
+            while (i < n && Character.isDigit(s.charAt(i))) {
+                num = num * 10 + (s.charAt(i) - '0');
+                i++;
+                hasNumber = true;
+            }
+
+            if (i < n && s.charAt(i) == 'x') {
+                // "x" means coefficient 1, "-x" means -1
+                coeff += sign * (hasNumber ? num : 1);
+                i++;
+            } else {
+                constant += sign * num;
+            }
+        }
+
+        return new int[]{coeff, constant};
+    }
+}
