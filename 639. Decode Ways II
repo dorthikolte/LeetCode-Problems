@@ -1,0 +1,58 @@
+class Solution {
+    public int numDecodings(String s) {
+        final long MOD = 1_000_000_007L;
+
+        // dp[i-2], dp[i-1]
+        long prev2 = 1; // empty string
+        long prev1 = waysOne(s.charAt(0));
+
+        for (int i = 1; i < s.length(); i++) {
+            char curr = s.charAt(i);
+            char prev = s.charAt(i - 1);
+
+            long currWays = 0;
+
+            // Decode current character by itself
+            currWays = (currWays + waysOne(curr) * prev1) % MOD;
+
+            // Decode previous + current as a pair
+            currWays = (currWays + waysTwo(prev, curr) * prev2) % MOD;
+
+            prev2 = prev1;
+            prev1 = currWays;
+        }
+
+        return (int) prev1;
+    }
+
+    // Number of ways '*' can represent a single digit.
+    private long waysOne(char c) {
+        if (c == '*') return 9;
+        if (c == '0') return 0;
+        return 1;
+    }
+
+    // Number of valid two-digit decodings represented by a,b.
+    private long waysTwo(char a, char b) {
+        if (a == '*' && b == '*') {
+            // 11-19 (9 possibilities) + 21-26 (6 possibilities)
+            return 15;
+        }
+
+        if (a == '*') {
+            // *b can be 10-19 if b <= 6, otherwise only 10-? invalid
+            if (b >= '0' && b <= '6') return 2; // 1b or 2b
+            if (b >= '7' && b <= '9') return 1; // only 1b
+            return 0;
+        }
+
+        if (b == '*') {
+            if (a == '1') return 9; // 11-19
+            if (a == '2') return 6; // 21-26
+            return 0;
+        }
+
+        int value = (a - '0') * 10 + (b - '0');
+        return value >= 10 && value <= 26 ? 1 : 0;
+    }
+}
