@@ -1,0 +1,21 @@
+import java.util.Arrays;
+
+class Solution {
+    public int findLongestChain(int[][] pairs) {
+        // Sort by right endpoint
+        Arrays.sort(pairs, (a, b) -> Integer.compare(a[1], b[1]));
+
+        int count = 0;
+        int prevEnd = Integer.MIN_VALUE;
+
+        for (int[] pair : pairs) {
+            // Current pair can follow the previous one
+            if (pair[0] > prevEnd) {
+                count++;
+                prevEnd = pair[1];
+            }
+        }
+
+        return count;
+    }
+}
