@@ -1,0 +1,31 @@
+class Solution {
+    public boolean checkValidString(String s) {
+        int minOpen = 0; // minimum possible unmatched '('
+        int maxOpen = 0; // maximum possible unmatched '('
+
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                minOpen++;
+                maxOpen++;
+            } else if (c == ')') {
+                minOpen--;
+                maxOpen--;
+            } else { // '*'
+                // '*' can be ')', empty, or '('
+                minOpen--;
+                maxOpen++;
+            }
+
+            // Too many ')' in every possible interpretation
+            if (maxOpen < 0) {
+                return false;
+            }
+
+            // minOpen can't be negative because we can treat '*' as empty/'('
+            minOpen = Math.max(minOpen, 0);
+        }
+
+        // Valid only if we can end with exactly 0 unmatched '('
+        return minOpen == 0;
+    }
+}
