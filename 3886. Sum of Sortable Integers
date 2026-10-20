@@ -1,0 +1,30 @@
+class Solution {
+    public int sortableIntegers(int[] nums) {
+        int n = nums.length;
+        int total = 0;
+        for (int k = 1; k <= n; k++) {
+            if (n % k != 0) continue;
+            if (check(nums, n, k)) total += k;
+        }
+        return total;
+    }
+
+    private boolean check(int[] nums, int n, int k) {
+        int prevMax = Integer.MIN_VALUE;
+        for (int s = 0; s < n; s += k) {
+            int mn = Integer.MAX_VALUE, mx = Integer.MIN_VALUE;
+            int desc = 0;
+            for (int i = s; i < s + k; i++) {
+                int cur = nums[i];
+                int nxt = (i + 1 < s + k) ? nums[i + 1] : nums[s];
+                if (cur > nxt) desc++;
+                if (cur < mn) mn = cur;
+                if (cur > mx) mx = cur;
+            }
+            if (desc > 1) return false;
+            if (mn < prevMax) return false;
+            prevMax = mx;
+        }
+        return true;
+    }
+}
