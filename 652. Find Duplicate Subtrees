@@ -1,0 +1,26 @@
+class Solution {
+    private Map<String, Integer> idMap = new HashMap<>();
+    private Map<Integer, Integer> count = new HashMap<>();
+    private List<TreeNode> result = new ArrayList<>();
+
+    public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
+        dfs(root);
+        return result;
+    }
+
+    private int dfs(TreeNode node) {
+        if (node == null) {
+            return 0;
+        }
+        int left = dfs(node.left);
+        int right = dfs(node.right);
+        String key = node.val + "," + left + "," + right;
+
+        int id = idMap.computeIfAbsent(key, k -> idMap.size() + 1);
+        int c = count.merge(id, 1, Integer::sum);
+        if (c == 2) {
+            result.add(node);
+        }
+        return id;
+    }
+}
