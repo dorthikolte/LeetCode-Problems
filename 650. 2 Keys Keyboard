@@ -1,0 +1,15 @@
+class Solution {
+    public int minSteps(int n) {
+        int ans = 0;
+        for (int f = 2; f * f <= n; f++) {
+            while (n % f == 0) {
+                ans += f;
+                n /= f;
+            }
+        }
+        if (n > 1) {
+            ans += n; // leftover prime factor
+        }
+        return ans;
+    }
+}
