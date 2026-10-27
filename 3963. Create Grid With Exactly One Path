@@ -1,0 +1,18 @@
+class Solution {
+    public String[] createGrid(int m, int n) {
+        String[] res = new String[m];
+        for (int i = 0; i < m; i++) {
+            char[] row = new char[n];
+            if (i == 0) {
+                // first row: all free
+                java.util.Arrays.fill(row, '.');
+            } else {
+                // other rows: obstacles except last column
+                java.util.Arrays.fill(row, '#');
+                row[n - 1] = '.';
+            }
+            res[i] = new String(row);
+        }
+        return res;
+    }
+}
