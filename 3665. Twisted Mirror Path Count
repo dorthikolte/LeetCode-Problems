@@ -1,0 +1,36 @@
+class Solution {
+    public int uniquePaths(int[][] grid) {
+        final int MOD = 1_000_000_007;
+        int m = grid.length, n = grid[0].length;
+
+        // R[i][j]: ways the robot attempts to enter (i,j) while moving right
+        // D[i][j]: ways the robot attempts to enter (i,j) while moving down
+        int[][] R = new int[m + 1][n + 1];
+        int[][] D = new int[m + 1][n + 1];
+
+        // Treat start as a landing cell with 1 way
+        R[0][0] = 1;
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int r = R[i][j], d = D[i][j];
+
+                if (grid[i][j] == 0) {
+                    int ways = (r + d) % MOD;
+                    if (ways == 0) continue;
+                    if (i == m - 1 && j == n - 1) return ways;
+                    // Move right: attempt to enter (i, j+1) moving right
+                    if (j + 1 < n) R[i][j + 1] = (R[i][j + 1] + ways) % MOD;
+                    // Move down: attempt to enter (i+1, j) moving down
+                    if (i + 1 < m) D[i + 1][j] = (D[i + 1][j] + ways) % MOD;
+                } else {
+                    // Mirror: entered moving right -> pushed down (attempt (i+1, j) moving down)
+                    if (i + 1 < m) D[i + 1][j] = (D[i + 1][j] + r) % MOD;
+                    // Mirror: entered moving down -> pushed right (attempt (i, j+1) moving right)
+                    if (j + 1 < n) R[i][j + 1] = (R[i][j + 1] + d) % MOD;
+                }
+            }
+        }
+        return 0;
+    }
+}
