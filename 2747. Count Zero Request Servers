@@ -1,0 +1,41 @@
+import java.util.*;
+
+class Solution {
+    public int[] countServers(int n, int[][] logs, int x, int[] queries) {
+        Arrays.sort(logs, (a, b) -> Integer.compare(a[1], b[1]));
+
+        int q = queries.length;
+        Integer[] order = new Integer[q];
+        for (int i = 0; i < q; i++) order[i] = i;
+        Arrays.sort(order, (a, b) -> Integer.compare(queries[a], queries[b]));
+
+        int[] cnt = new int[n + 1];
+        int active = 0;
+        int left = 0, right = 0, m = logs.length;
+        int[] ans = new int[q];
+
+        for (int idx : order) {
+            int query = queries[idx];
+
+            // add logs with time <= query
+            while (right < m && logs[right][1] <= query) {
+                int s = logs[right][0];
+                if (cnt[s] == 0) active++;
+                cnt[s]++;
+                right++;
+            }
+
+            // remove logs with time < query - x
+            while (left < right && logs[left][1] < query - x) {
+                int s = logs[left][0];
+                cnt[s]--;
+                if (cnt[s] == 0) active--;
+                left++;
+            }
+
+            ans[idx] = n - active;
+        }
+
+        return ans;
+    }
+}
