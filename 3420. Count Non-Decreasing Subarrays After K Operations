@@ -1,0 +1,45 @@
+import java.util.*;
+
+class Solution {
+    public long countNonDecreasingSubarrays(int[] nums, int k) {
+        int n = nums.length;
+        long[] P = new long[n + 1];
+        for (int i = 0; i < n; i++) P[i + 1] = P[i] + nums[i];
+
+        // segments: {value, start, end}, front = leftmost
+        Deque<long[]> dq = new ArrayDeque<>();
+        long cost = 0;
+        long ans = 0;
+        int r = n - 1;
+
+        for (int l = n - 1; l >= 0; l--) {
+            long v = nums[l];
+            int start = l, end = l;
+            // merge segments with value <= nums[l]
+            while (!dq.isEmpty() && dq.peekFirst()[0] <= v) {
+                long[] s = dq.pollFirst();
+                int a = (int) s[1], b = (int) s[2];
+                cost -= s[0] * (b - a + 1) - (P[b + 1] - P[a]);
+                end = b;
+            }
+            cost += v * (end - start + 1) - (P[end + 1] - P[start]);
+            dq.addFirst(new long[]{v, start, end});
+
+            // shrink right end while cost > k
+            while (cost > k) {
+                long[] last = dq.peekLast();
+                int a = (int) last[1], b = (int) last[2];
+                // remove index b (== r) from the last segment
+                cost -= last[0] - nums[b];
+                if (a == b) {
+                    dq.pollLast();
+                } else {
+                    last[2] = b - 1;
+                }
+                r--;
+            }
+            ans += r - l + 1;
+        }
+        return ans;
+    }
+}
