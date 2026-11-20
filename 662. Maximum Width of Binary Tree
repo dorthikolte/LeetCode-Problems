@@ -1,0 +1,41 @@
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+class Solution {
+    public int widthOfBinaryTree(TreeNode root) {
+        if (root == null) return 0;
+
+        Queue<TreeNode> nodes = new ArrayDeque<>();
+        Queue<Long> indices = new ArrayDeque<>();
+        nodes.offer(root);
+        indices.offer(0L);
+
+        long maxWidth = 0;
+
+        while (!nodes.isEmpty()) {
+            int size = nodes.size();
+            long first = indices.peek();
+            long last = first;
+
+            for (int i = 0; i < size; i++) {
+                TreeNode node = nodes.poll();
+                long idx = indices.poll() - first; // normalize to avoid overflow
+                last = idx;
+
+                if (node.left != null) {
+                    nodes.offer(node.left);
+                    indices.offer(2 * idx + 1);
+                }
+                if (node.right != null) {
+                    nodes.offer(node.right);
+                    indices.offer(2 * idx + 2);
+                }
+            }
+
+            // after normalization, the first node of the level has index 0
+            maxWidth = Math.max(maxWidth, last + 1);
+        }
+
+        return (int) maxWidth;
+    }
+}
