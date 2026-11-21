@@ -1,0 +1,16 @@
+class Solution {
+    public int[] constructArray(int n, int k) {
+        int[] ans = new int[n];
+        int lo = 1, hi = k + 1;
+        int idx = 0;
+        boolean takeLow = true;
+        while (lo <= hi) {
+            ans[idx++] = takeLow ? lo++ : hi--;
+            takeLow = !takeLow;
+        }
+        for (int v = k + 2; v <= n; v++) {
+            ans[idx++] = v;
+        }
+        return ans;
+    }
+}
