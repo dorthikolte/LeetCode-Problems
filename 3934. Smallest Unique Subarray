@@ -1,0 +1,76 @@
+class Solution {
+    public int smallestUniqueSubarray(int[] nums) {
+        int n = nums.length;
+        int[] sa = buildSA(nums);
+        int[] rank = new int[n];
+        for (int i = 0; i < n; i++) rank[sa[i]] = i;
+
+        // lcp[r] = LCP of suffix sa[r] and sa[r-1]  (Kasai)
+        int[] lcp = new int[n + 1];
+        int h = 0;
+        for (int i = 0; i < n; i++) {
+            if (rank[i] > 0) {
+                int j = sa[rank[i] - 1];
+                while (i + h < n && j + h < n && nums[i + h] == nums[j + h]) h++;
+                lcp[rank[i]] = h;
+                if (h > 0) h--;
+            } else {
+                h = 0;
+            }
+        }
+
+        int ans = n;
+        for (int r = 0; r < n; r++) {
+            int left = lcp[r];
+            int right = (r + 1 < n) ? lcp[r + 1] : 0;
+            int len = Math.max(left, right) + 1;
+            if (len <= n - sa[r]) {          // must fit within the suffix
+                ans = Math.min(ans, len);
+            }
+        }
+        return ans;
+    }
+
+    private int[] buildSA(int[] s) {
+        int n = s.length;
+        int[] sa = new int[n];
+        int[] rnk = new int[n];
+        int[] tmp = new int[n];
+        int[] sa2 = new int[n];
+        int m = 100002;
+        int[] cnt = new int[Math.max(m, n) + 2];
+
+        for (int i = 0; i < n; i++) cnt[s[i]]++;
+        for (int i = 1; i < cnt.length; i++) cnt[i] += cnt[i - 1];
+        for (int i = n - 1; i >= 0; i--) sa[--cnt[s[i]]] = i;
+        rnk[sa[0]] = 0;
+        int classes = 1;
+        for (int i = 1; i < n; i++) {
+            if (s[sa[i]] != s[sa[i - 1]]) classes++;
+            rnk[sa[i]] = classes - 1;
+        }
+
+        for (int k = 1; k < n && classes < n; k <<= 1) {
+            int p = 0;
+            for (int i = n - k; i < n; i++) sa2[p++] = i;
+            for (int i = 0; i < n; i++) if (sa[i] >= k) sa2[p++] = sa[i] - k;
+
+            java.util.Arrays.fill(cnt, 0, classes + 1, 0);
+            for (int i = 0; i < n; i++) cnt[rnk[i]]++;
+            for (int i = 1; i < classes; i++) cnt[i] += cnt[i - 1];
+            for (int i = n - 1; i >= 0; i--) sa[--cnt[rnk[sa2[i]]]] = sa2[i];
+
+            tmp[sa[0]] = 0;
+            classes = 1;
+            for (int i = 1; i < n; i++) {
+                int a = sa[i], b = sa[i - 1];
+                int a2 = a + k < n ? rnk[a + k] : -1;
+                int b2 = b + k < n ? rnk[b + k] : -1;
+                if (rnk[a] != rnk[b] || a2 != b2) classes++;
+                tmp[a] = classes - 1;
+            }
+            int[] t = rnk; rnk = tmp; tmp = t;
+        }
+        return sa;
+    }
+}
