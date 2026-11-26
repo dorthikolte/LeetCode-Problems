@@ -1,0 +1,16 @@
+class Solution {
+    public boolean canAliceWin(int n) {
+        int remove = 10;
+        boolean aliceTurn = true;
+        
+        while (n >= remove) {
+            n -= remove;
+            remove--;
+            aliceTurn = !aliceTurn;
+        }
+        
+        // The player whose turn it is cannot move and loses.
+        // If it's Bob's turn, Bob loses, so Alice wins.
+        return !aliceTurn;
+    }
+}
