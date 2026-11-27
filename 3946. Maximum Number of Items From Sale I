@@ -1,0 +1,30 @@
+class Solution {
+    public int maximumSaleItems(int[][] items, int budget) {
+        int n = items.length;
+        int[] val = new int[n];
+        int pmin = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            int g = 0;
+            for (int j = 0; j < n; j++) {
+                if (j != i && items[j][0] % items[i][0] == 0) g++;
+            }
+            val[i] = 1 + g;
+            pmin = Math.min(pmin, items[i][1]);
+        }
+        int[] dp = new int[budget + 1];
+        // 0/1 knapsack: first copy of each item type
+        for (int i = 0; i < n; i++) {
+            int p = items[i][1];
+            for (int b = budget; b >= p; b--) {
+                dp[b] = Math.max(dp[b], dp[b - p] + val[i]);
+            }
+        }
+        // unbounded: extra copies of the cheapest item
+        for (int b = pmin; b <= budget; b++) {
+            dp[b] = Math.max(dp[b], dp[b - pmin] + 1);
+        }
+        int ans = 0;
+        for (int b = 0; b <= budget; b++) ans = Math.max(ans, dp[b]);
+        return ans;
+    }
+}
